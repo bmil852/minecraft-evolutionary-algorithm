@@ -41,7 +41,7 @@ class MinMaxAgent:
         self.state_rewards = state_rewards
         self.p_num = p_num
     
-    def act(self, state):
+    def act(self, state, r, c):
         print(state)
         next_op = self.state_rewards[json.dumps(state)]
         print(next_op)
