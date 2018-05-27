@@ -95,7 +95,7 @@ def genXML(envDescription):
               </AgentSection>
             </Mission>'''
 
-def evaluateFitness(environment, motor_function):
+def evaluateFitness(environment, motorfunc_list):
     agent_host = MalmoPython.AgentHost()
     try:
         agent_host.parse( sys.argv )
@@ -196,9 +196,12 @@ def evaluateFitness(environment, motor_function):
                 yOut = -1 * min(abs(y_delta), 1)
         print()
         print("Mission ended")
-        yError = motor_function[0] - yOut
-        zError = motor_function[1] - zOut
-        errorSum = abs(yError) + abs(zError)
-        print("Error was: " + str(errorSum))
-        return errorSum
-        # Mission has ended.
+        errorSumList = []
+        for motor_function in motorfunc_list:
+            yError = motor_function[0] - yOut
+            zError = motor_function[1] - zOut
+            errorSum = abs(yError) + abs(zError)
+            print("Error was: " + str(errorSum))
+            errorSumList.append(errorSum)
+
+        return errorSumList

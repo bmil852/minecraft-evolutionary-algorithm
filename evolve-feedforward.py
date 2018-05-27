@@ -6,26 +6,36 @@ import katniss
 import random
 
 def eval_genomes(genomes, config):
+    z1 = 5
+    z2 = 25
+    y1 = 56
+    y2 = 65
+    x = 0
+    rand_y = random.randint(y1+2, y2-2)
+    rand_z = random.randint(z1+2, z2-2)
+    environment = [z1, z2, y1, y2, x, rand_y, rand_z]
+    nn_inputs = [normalize(rand_y-(y1+1),y2-y1), normalize(rand_z-(z1+1),z2-z1)]
+    print(nn_inputs)
+    genomeList = []
+    outputList = []
+    
     for genome_id, genome in genomes:
         genome.fitness = 1
         net = neat.nn.FeedForwardNetwork.create(genome, config)
-        z1 = 5
-        z2 = 25
-        y1 = 56
-        y2 = 65
-        x = 0
-        for i in range(1):
-            rand_y = random.randint(y1+1, y2-1)
-            rand_z = random.randint(z1+1, z2-1)
-            environment = [z1, z2, y1, y2, x, rand_y, rand_z]
-            nn_inputs = [normalize(rand_y-(y1+1),y2-y1), normalize(rand_z-(z1+1),z2-z1)]
-            print(nn_inputs)
-            output = net.activate(nn_inputs)
-            genome.fitness -= katniss.evaluateFitness(environment, output)
-            print("New fitness for individual is: " + str(genome.fitness))
+        genomeList.append(genome)
+        output = net.activate(nn_inputs)
+        outputList.append(output)
+
+    errorList = katniss.evaluateFitness(environment, outputList)
+
+    i = 0
+    for g in genomeList:
+        g.fitness -= errorList[i]
+        i += 1
+        print("New fitness for individual is: " + str(g.fitness))
 
 def normalize(value, valueRange):
-    valueRange -= 2
+    valueRange -= 4
     valueRange /= 2.0
     return (value - valueRange * 1.0)/valueRange
 
