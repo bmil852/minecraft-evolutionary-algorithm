@@ -35,7 +35,7 @@ def normalize(value, valueRange):
 
 def run(config_file):
     # Create the population from loaded checkpoint, which is the top-level object for a NEAT run.
-    p = neat.Population(neat.Checkpointer.restore_checkpoint('neat-checkpoint-3'))
+    p = neat.Checkpointer.restore_checkpoint('neat-checkpoint-3')
 
     # Add a stdout reporter to show progress in the terminal.
     p.add_reporter(neat.StdOutReporter(True))
