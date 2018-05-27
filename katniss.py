@@ -60,7 +60,7 @@ def genXML(envDescription):
                   <DrawingDecorator>
                     ''' + targetWall(envDescription) + '''
                   </DrawingDecorator>
-                  <ServerQuitFromTimeUp timeLimitMs="3000"/>
+                  <ServerQuitFromTimeUp timeLimitMs="1"/>
                   <ServerQuitWhenAnyAgentFinishes/>
                 </ServerHandlers>
               </ServerSection>
@@ -196,9 +196,9 @@ def evaluateFitness(environment, motor_function):
                 yOut = -1 * min(abs(y_delta), 1)
         print()
         print("Mission ended")
-        yError = yOut - motor_function[0]
-        zError = zOut - motor_function[1]
-        errorSum = yError + zError
+        yError = motor_function[0] - yOut
+        zError = motor_function[1] - zOut
+        errorSum = abs(yError) + abs(zError)
         print("Error was: " + str(errorSum))
         return errorSum
         # Mission has ended.
