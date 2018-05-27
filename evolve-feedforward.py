@@ -34,13 +34,8 @@ def normalize(value, valueRange):
     return (value - valueRange * 1.0)/valueRange
 
 def run(config_file):
-    # Load configuration.
-    config = neat.Config(neat.DefaultGenome, neat.DefaultReproduction,
-                         neat.DefaultSpeciesSet, neat.DefaultStagnation,
-                         config_file)
-
-    # Create the population, which is the top-level object for a NEAT run.
-    p = neat.Population(config)
+    # Create the population from loaded checkpoint, which is the top-level object for a NEAT run.
+    p = neat.Population(neat.Checkpointer.restore_checkpoint('neat-checkpoint-3'))
 
     # Add a stdout reporter to show progress in the terminal.
     p.add_reporter(neat.StdOutReporter(True))
