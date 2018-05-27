@@ -42,11 +42,11 @@ def targetWall(env):
 def genXML(envDescription):
     return '''<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
             <Mission xmlns="http://ProjectMalmo.microsoft.com" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-            
+
               <About>
                 <Summary>Hello world!</Summary>
               </About>
-              
+
             <ServerSection>
               <ServerInitialConditions>
                 <Time>
@@ -64,7 +64,7 @@ def genXML(envDescription):
                   <ServerQuitWhenAnyAgentFinishes/>
                 </ServerHandlers>
               </ServerSection>
-              
+
               <AgentSection mode="Survival">
                 <Name>agent</Name>
                 <AgentStart>
@@ -137,10 +137,11 @@ def evaluateFitness(environment, motor_function):
 
         print()
         print("Mission running ", end=' ')
-    
+
         min_distance = 1000
         agent_host.sendCommand("hotbar.9 1")
         agent_host.sendCommand("hotbar.9 0")
+        # Loop until mission ends:
         s = time.time()
         agent_y = 0
         agent_z = 0
@@ -148,20 +149,14 @@ def evaluateFitness(environment, motor_function):
         agent_pitch = 0
         arrow_y = 0
         arrow_z = 0
-        arrow_x = 0
         target_y = 0
         target_z = 0
-        target_x = 0
-        arrow_x = 0
         while world_state.is_mission_running:
+            print(".", end="")
             time.sleep(0.01)
             world_state = agent_host.getWorldState()
             for error in world_state.errors:
                 print("Error:",error.text)
-            shoot = 1 if (time.time() - s < 1.5) else 0
-                
-            #agent_host.sendCommand("pitch " + str(random.random()*2 - 1))
-            agent_host.sendCommand("use " + str(shoot))
 
             if world_state.number_of_observations_since_last_state > 0:
                 msg = world_state.observations[-1].text
@@ -179,15 +174,31 @@ def evaluateFitness(environment, motor_function):
                         if e["name"] == "apple":
                             target_y = e["y"]
                             target_z = e["z"]
-                            target_x = e["x"]
-                        if e["name"] == "Arrow":
-                            arrow_y = e["y"]
-                            arrow_z = e["z"]
-                            arrow_x = e["x"]
-                            min_distance = math.sqrt(math.pow(arrow_y - target_y, 2) + math.pow(arrow_z - target_z, 2) + math.pow(arrow_x - target_x, 2))
-                            
-            agent_host.sendCommand("turn " + str(motor_function[0]))
-            agent_host.sendCommand("pitch " + str(motor_function[1]))
+
+            yaw_sign = -1 if agent_yaw > 90 else 1
+            look_at_z = (math.tan(math.radians(abs(agent_yaw - 90))) * 15) * yaw_sign  + agent_z
+            z_delta = target_z - look_at_z
+            z_d_sign = 1 if z_delta > 0 else -1
+            zOut = 0
+            if(z_d_sign < 0):
+                zOut = 1* min(abs(z_delta), 1)
+            else:
+                zOut = -1* min(abs(z_delta), 1)
+
+            pitch_sign = -1 if agent_pitch > 0 else 1
+            look_at_y = (math.tan(math.radians(abs(agent_pitch))) * 15) * pitch_sign  + agent_y + 0.5
+            y_delta = target_y - look_at_y
+            y_d_sign = 1 if y_delta > 0 else -1
+            yOut = 0
+            if(y_d_sign < 0):
+                yOut = 1 * min(abs(y_delta), 1)
+            else:
+                yOut = -1 * min(abs(y_delta), 1)
+        print()
         print("Mission ended")
-        print("Distance was {0}".format(min_distance))
-        return 1/min_distance
+        yError = yOut - motor_function[0]
+        zError = zOut - motor_function[1]
+        errorSum = yError + zError
+        print("Error was: " + str(errorSum))
+        return errorSum
+        # Mission has ended.

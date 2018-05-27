@@ -7,26 +7,22 @@ import random
 
 def eval_genomes(genomes, config):
     for genome_id, genome in genomes:
-        genome.fitness = 0
+        genome.fitness = 1
         net = neat.nn.FeedForwardNetwork.create(genome, config)
         z1 = 5
         z2 = 25
         y1 = 56
         y2 = 65
         x = 0
-        maxFitness = 0
-        for i in range(5):
+        for i in range(1):
             rand_y = random.randint(y1+1, y2-1)
             rand_z = random.randint(z1+1, z2-1)
             environment = [z1, z2, y1, y2, x, rand_y, rand_z]
             nn_inputs = [normalize(rand_y-(y1+1),y2-y1), normalize(rand_z-(z1+1),z2-z1)]
             print(nn_inputs)
             output = net.activate(nn_inputs)
-            currentFitness = katniss.evaluateFitness(environment, output)
-            if (currentFitness > maxFitness):
-                maxFitness = currentFitness
-        genome.fitness = maxFitness
-        print("New fitness for individual is: " + str(genome.fitness))
+            genome.fitness -= katniss.evaluateFitness(environment, output)
+            print("New fitness for individual is: " + str(genome.fitness))
 
 def normalize(value, valueRange):
     valueRange -= 2
