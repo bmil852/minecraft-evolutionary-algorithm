@@ -38,8 +38,8 @@ else:
 step = 4
 v_width = 432*2
 v_height = 240*2
-sensor_y = 4
-sensor_x = 4
+sensor_y = 2
+sensor_x = 2
 def processFrame(frame):
     sensors = []
     for y in range(0, sensor_y):
@@ -61,8 +61,8 @@ def processFrame(frame):
     return [item for sublist in sensors for item in sublist]
 
 def fake_nn(inputs):
-    yaw_weights = [-1, -0.5, 0.5, 1, -1, -0.5, 0.5, 1, -1, -0.5, 0.5, 1, -1, -0.5, 0.5, 1]
-    pitch_weights = [-1, -1, -1, -1, -0.5, -0.5, -0.5, -0.5, 0.5, 0.5, 0.5, 0.5, 1, 1, 1, 1]
+    yaw_weights = [-1, 1, -1, 1]
+    pitch_weights = [-1, -1, 1, 1]
     yaw_out = 0
     pitch_out = 0
     for i,val in enumerate(inputs):
